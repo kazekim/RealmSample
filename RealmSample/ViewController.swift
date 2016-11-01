@@ -33,30 +33,31 @@ class ViewController: UITableViewController {
         
         // get Hatena hotentries
         
-        Alamofire.request(.GET, hotEntryUrl).responseJSON { (request, response, result) -> Void in
+        Alamofire.request(hotEntryUrl,method: .get, parameters: [:], encoding: URLEncoding.default, headers: [:])
+        .validate().responseJSON { response in
             
-            if result.isFailure {
+            if response.result.isFailure {
                 // FIXME:you need to handle errors.
+                print("Fail : Fix me \(response.result.debugDescription)")
                 return
             }
             
-            // write request result to realm database
-            let json = JSON(result.value!)
-            let entries = json["responseData"]["feed"]["entries"]
-            realm.beginWrite()
-            for (_, subJson) : (String, JSON) in entries {
-                let entry : Entry = Mapper<Entry>().map(subJson.dictionaryObject)!
-                realm.add(entry, update: true)
-            }
-            
-            do {
-                try realm.commitWrite()
-            } catch {
+                // write request result to realm database
+                let json = JSON(response.result.value!)
+                let entries = json["responseData"]["feed"]["entries"]
+                realm.beginWrite()
+                for (_, subJson) : (String, JSON) in entries {
+                    let entry : Entry = Mapper<Entry>().map(JSON: subJson.dictionaryObject!)!
+                    realm.add(entry, update: true)
+                }
                 
-            }
-            self.updateTableView()
+                do {
+                    try realm.commitWrite()
+                } catch {
+                    
+                }
+                self.updateTableView()
         }
-        
     }
     
     /**
@@ -66,7 +67,7 @@ class ViewController: UITableViewController {
     func updateTableView() {
 
         do {
-            self.entries = try Realm().objects(Entry).sorted(by: { (entry1, entry2) -> Bool in
+            self.entries = try Realm().objects(Entry.self).sorted(by: { (entry1, entry2) -> Bool in
             let res = entry1.publishedDate.compare(entry2.publishedDate as Date)
             return (res == .orderedAscending || res == .orderedSame)
             })

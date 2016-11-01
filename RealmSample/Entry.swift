@@ -20,7 +20,7 @@ class Entry : Object {
     
     required convenience init?(map: Map) {
         self.init()
-        mapping(map)
+        mapping(map: map)
     }
     
     override class func primaryKey() -> String {
