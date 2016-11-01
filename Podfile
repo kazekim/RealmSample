@@ -1,8 +1,22 @@
-platform :ios, '8.0'
+platform :ios, '9.0'
 use_frameworks!
 
-pod 'Alamofire', '~> 2.0'
-pod 'ObjectMapper', '~> 0.11'
-pod 'AlamofireObjectMapper', '~> 0.2'
-pod 'SwiftyJSON', '~> 2.2'
-pod 'RealmSwift', '~> 0.92'
+def available_pods
+  pod 'Alamofire', '~> 4.0'
+  pod 'ObjectMapper'
+  pod 'AlamofireObjectMapper'
+  pod 'SwiftyJSON'
+  pod 'RealmSwift'
+end
+
+target 'RealmSample' do
+    available_pods
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '3.0'
+    end
+  end
+end

@@ -14,11 +14,11 @@ class Entry : Object {
     
     dynamic var content : String = ""
     dynamic var link : String = ""
-    dynamic var publishedDate : NSDate = NSDate()
+    dynamic var publishedDate : Date = Date()
     dynamic var title : String = ""
     dynamic var contentSnippet : String = ""
     
-    required convenience init?(_ map: Map) {
+    required convenience init?(map: Map) {
         self.init()
         mapping(map)
     }
@@ -41,12 +41,12 @@ extension Entry : Mappable {
 
 
 class EntryDateTransform : DateTransform {
-    override func transformFromJSON(value: AnyObject?) -> NSDate? {
+    override func transformFromJSON(_ value: Any?) -> Date? {
         if let dateStr = value as? String {
-            return NSDate.dateWithString(
+            return Date.dateWithString(
                 dateStr,
                 format: "E, dd MMM yyyy HH:mm:ss zzzz" ,
-                locale : NSLocale(localeIdentifier: "en_US"))
+                locale : Locale(identifier: "en_US"))
         }
         return nil
     }
